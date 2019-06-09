@@ -1,0 +1,176 @@
+﻿@using System.Linq
+@using  HOCBusiness.Controllers
+@using  HOCBusiness.Domain
+@model IEnumerable<HOCBusiness.Domain.Event>
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    ViewData["Title"] = "Business in the main chamber of the House of Commons";
+    var startDate = ViewBag.StartDate;
+    var endDate = ViewBag.EndDate;
+    var house = ViewBag.House;
+    var eventType = ViewBag.EventType;
+    var orderByStart = ViewBag.OrderByStart;
+    var events = Model.ToList();
+}
+
+<div class="container">
+    <form method="get" asp-action="Index" asp-controller="Home" asp-antiforgery="false">
+        <fieldset>
+            <label for="start-date">Start date</label>
+            <input id="start-date"  class="form-control form-control-md" type="date" name="startDate" value="@startDate.ToString("yyyy-MM-dd")">
+            <label for="house">House</label>
+            <select name="house" class="form-control form-control-md">
+                @if (house == HouseType.Commons)
+                {
+                    <option value="Commons" selected>Commons</option>
+                    <option value="Lords">Lords</option>
+                    <option value="Both">Both</option>
+                }
+                else if (house == HouseType.Lords)
+                {
+                    <option value="Commons">Commons</option>
+                    <option value="Lords" selected>Lords</option>
+                    <option value="Both">Both</option>
+                }
+                else
+                {
+                    <option value="Commons">Commons</option>
+                    <option value="Lords">Lords</option>
+                    <option value="Both" selected>Both</option>
+                }
+            </select>
+
+            <label for="eventType">Event type</label>
+            <select name="eventType" class="form-control form-control-md">
+                @if (eventType == EventType.MainChamber)
+                {
+                    <option value="Main Chamber" selected>Main Chamber</option>
+                    <option value="General Committee">General Committee</option>
+                    <option value="Westminster Hall">Westminster Hall</option>
+                    <option value="Select & Joint Committees">Select & Joint Committees</option>
+                    <option value="All">All</option>
+                }
+                else if (eventType == EventType.GeneralCommittee)
+                {
+                    <option value="Main Chamber">Main Chamber</option>
+                    <option value="General Committee" selected>General Committee</option>
+                    <option value="Westminster Hall">Westminster Hall</option>
+                    <option value="Select & Joint Committees">Select & Joint Committees</option>
+                    <option value="All">All</option>
+                }
+                else if (eventType == EventType.WestminsterHall)
+                {
+                    <option value="Main Chamber">Main Chamber</option>
+                    <option value="General Committee">General Committee</option>
+                    <option value="Westminster Hall" selected>Westminster Hall</option>
+                    <option value="Select & Joint Committees">Select & Joint Committees</option>
+                    <option value="All">All</option>
+                }
+                else if (eventType == EventType.SelectJointCommittees)
+                {
+                    <option value="Main Chamber">Main Chamber</option>
+                    <option value="General Committee">General Committee</option>
+                    <option value="Westminster Hall">Westminster Hall</option>
+                    <option value="Select & Joint Committees" selected>Select & Joint Committees</option>
+                    <option value="All">All</option>
+                }
+                else
+                {
+                    <option value="Main Chamber">Main Chamber</option>
+                    <option value="General Committee">General Committee</option>
+                    <option value="Westminster Hall">Westminster Hall</option>
+                    <option value="Select & Joint Committees">Select & Joint Committees</option>
+                    <option value="All" selected>All</option>
+                }
+            </select>
+
+            <label for="orderByStart">Order by start date</label>
+            <select name="orderByStart" class="form-control form-control-md">
+                @if (orderByStart == "Descending")
+                {
+                    <option value="Descending" selected>Descending</option>
+                    <option value="Ascending">Ascending</option>
+                }
+                else
+                {
+                    <option value="Descending">Descending</option>
+                    <option value="Ascending" selected>Ascending</option>
+                }
+            </select>
+            
+            <input class="btn btn-outline-primary btn-sm" type="submit" value="Find events">
+</fieldset>
+    </form>
+</div>
+
+@if (events.Count > 0)
+{
+    <section>
+        <div class="container">
+            <h4> There are @events.Count events between @startDate.ToString("yyyy-MM-dd") and @endDate.ToString("yyyy-MM-dd").</h4>
+            <ul class="list-group list-group-flush">
+                @foreach (var evt in events)
+                {
+                    <li class="list-group-item">
+                        <div class="card">
+                            <div class="card__details">
+                                <dl>
+                                    <dt>Description</dt>
+                                    <dd>@evt.Description</dd>
+                                    <dt>Start Date</dt>
+                                    <dd>@evt.StartDate.GetValueOrDefault().ToString("yyyy-MM-dd")</dd>
+                                    <dt>Start Time</dt>
+                                    <dd>@evt.StartTime</dd>
+                                    <dt>End Date</dt>
+                                    <dd>@evt.EndDate.GetValueOrDefault().ToString("yyyy-MM-dd")</dd>
+                                    <dt>End Time</dt>
+                                    <dd>@evt.EndTime</dd>
+                                    <dt class="moreInfo">Category</dt>
+                                    <dd class="moreInfo">@evt.Category</dd>
+
+                                    @if (evt.Members.Count > 0)
+                                    {
+                                        <dt class="moreInfo">Members</dt>
+                                        <dd class="moreInfo">
+                                            <ul>
+                                                @foreach (var member in evt.Members)
+                                                {
+                                                    <li id="@member.Id">
+                                                        <dl>
+                                                            <dt class="moreInfo">Full Title</dt>
+                                                            <dd class="fullTitle"></dd>
+                                                            <dt class="moreInfo">Party</dt>
+                                                            <dd class="party"></dd>
+                                                            <dt class="moreInfo">Member From</dt>
+                                                            <dd class="memberFrom"></dd>
+                                                        </dl>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </dd>
+                                    }
+                                </dl>
+                                <a href="#" id="@evt.Id" onclick="GetDetails(event);">Show more details</a>
+                            </div>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    </section>
+}
+else
+{
+    <section>
+        <div class="container">
+            <h1>No events found</h1>
+            <p>There seems to be no events for the week selected.</p>
+            <p>Check <a href="https://calendar.parliament.uk">UK Parliament calendar page</a> for details.</p>
+        </div>
+    </section>
+}
+
