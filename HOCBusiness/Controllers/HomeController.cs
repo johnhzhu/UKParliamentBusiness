@@ -33,8 +33,8 @@ namespace HOCBusiness.Controllers
         {
             _calendarService = calendarService;
             _dayOffset = config.GetSection("CalendarService")["DayOffset"];
-            _house = HouseType.Commons;
-            _eventType = EventType.MainChamber;
+            _house = config.GetSection("CalendarService")["HouseType"];
+            _eventType = config.GetSection("CalendarService")["EventType"];
         }
 
         public IActionResult Index()

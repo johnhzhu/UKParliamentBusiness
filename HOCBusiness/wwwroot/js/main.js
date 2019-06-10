@@ -7,18 +7,18 @@ function GetDetails(event) {
     if (event.target.classList.length == 0) {
         event.target.parentNode.classList.add('moreInfoFetched');
 
-        Array.from(event.target.parentNode.querySelectorAll("ul li")).forEach(element =>
+        Array.from(event.target.parentNode.querySelectorAll("ul li")).forEach(e =>
         {
-            var request = new Request("/api/member/" + element.id, { method: 'GET' });
+            var request = new Request("/api/member/" + e.id, { method: 'GET' });
             fetch(request)
                 .then(function (resp) {
                     return resp.json();
             })
             .catch(function (resp) { console.log(resp) })
             .then(function (jsonResp) {
-                element.querySelector(".fullTitle").textContent = jsonResp.fullTitle;
-                element.querySelector(".memberFrom").textContent = jsonResp.memberFrom;
-                element.querySelector(".party").textContent = jsonResp.party.name;
+                e.querySelector(".fullTitle").textContent = jsonResp.fullTitle;
+                e.querySelector(".memberFrom").textContent = jsonResp.memberFrom;
+                e.querySelector(".party").textContent = jsonResp.party.name;
             })
     });
 }
